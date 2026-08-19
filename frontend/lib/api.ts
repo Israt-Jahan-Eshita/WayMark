@@ -6,12 +6,15 @@ export async function fetchHealth() {
   return res.json();
 }
 
-export async function runAudit(buildingName: string, location: string, files: File[], reuseLast: boolean = false) {
+export async function runAudit(buildingName: string, location: string, files: File[], reuseLast: boolean = false, lat?: number | null, lng?: number | null) {
   const formData = new FormData();
   formData.append("building_name", buildingName);
   if (location) {
     formData.append("location", location);
   }
+  if (lat !== undefined && lat !== null) formData.append("latitude", lat.toString());
+  if (lng !== undefined && lng !== null) formData.append("longitude", lng.toString());
+  
   formData.append("reuse_last", reuseLast ? "true" : "false");
   
   if (!reuseLast) {

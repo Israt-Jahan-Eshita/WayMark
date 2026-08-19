@@ -188,6 +188,8 @@ def get_building_history(building_id: str) -> AuditHistoryResponse:
         id=b_row["id"],
         name=b_row["name"],
         location=b_row["location"],
+        latitude=b_row["latitude"],
+        longitude=b_row["longitude"],
         latest_score=latest_score,
         created_at=datetime.fromisoformat(b_row["created_at"])
     )
@@ -202,6 +204,8 @@ def get_building_history(building_id: str) -> AuditHistoryResponse:
                 building_id=row["building_id"],
                 building_name=building.name,
                 location=building.location,
+                latitude=building.latitude,
+                longitude=building.longitude,
                 score=row["score"],
                 findings=findings,
                 checklist_version=row["checklist_version"],

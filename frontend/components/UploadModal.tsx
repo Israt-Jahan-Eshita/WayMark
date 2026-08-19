@@ -28,6 +28,8 @@ export default function UploadModal({
   const [files, setFiles] = useState<File[]>([]);
   const [buildingName, setBuildingName] = useState(defaultBuildingName);
   const [location, setLocation] = useState(defaultLocation);
+  const [latitude, setLatitude] = useState<number | null>(null);
+  const [longitude, setLongitude] = useState<number | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [showMap, setShowMap] = useState(false);
@@ -38,6 +40,8 @@ export default function UploadModal({
     if (isOpen) {
       setBuildingName(defaultBuildingName);
       setLocation(defaultLocation || "");
+      setLatitude(null);
+      setLongitude(null);
       setFiles([]);
       setError(null);
     }
@@ -73,7 +77,7 @@ export default function UploadModal({
     setError(null);
     
     try {
-      const report = await runAudit(buildingName, location, files, reuseLast);
+      const report = await runAudit(buildingName, location, files, reuseLast, latitude, longitude);
       onSuccess(report);
       onClose();
     } catch (err: any) {
@@ -371,6 +375,8 @@ export default function UploadModal({
             <DynamicLocationPicker 
               onSelect={(locName, lat, lng) => {
                 setLocation(locName);
+                setLatitude(lat);
+                setLongitude(lng);
                 setShowMap(false);
               }} 
             />

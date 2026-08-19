@@ -38,6 +38,8 @@ async def create_new_audit(
     request: Request,
     building_name: str = Form(...),
     location: Optional[str] = Form(None),
+    latitude: Optional[float] = Form(None),
+    longitude: Optional[float] = Form(None),
     files: Optional[List[UploadFile]] = File(None),
     reuse_last: bool = Form(False)
 ):
@@ -126,8 +128,11 @@ async def create_new_audit(
         verified_count = sum(1 for f in findings if f.result == "verified")
         score_str = f"{verified_count}/{len(findings)}"
         
-        # Geocode
-        lat, lng = geocode_location(location)
+        # Use provided coordinates or Geocode
+        if latitude is not None and longitude is not None:
+            lat, lng = latitude, longitude
+        else:
+            lat, lng = geocode_location(location)
         
         report = AuditReport(
             building_name=building_name,
@@ -149,13 +154,6 @@ async def create_new_audit(
         raise
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
-    finally:
-        # Cleanup UUID folder
-        try:
-            if os.path.exists(save_dir):
-                shutil.rmtree(save_dir)
-        except:
-            pass
 
 @router.get("/{id}", response_model=AuditResponse)
 async def get_audit(id: str = Path(...)):

@@ -44,7 +44,8 @@ export default function LocationPickerMap({
     if (!position) return;
     setLoadingName(true);
     try {
-      const response = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${position[0]}&lon=${position[1]}`);
+      const headers = { "User-Agent": "WayMark-Hackathon-App" };
+      const response = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${position[0]}&lon=${position[1]}`, { headers });
       const data = await response.json();
       
       let locationStr = "Unknown Location";
