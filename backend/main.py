@@ -29,12 +29,15 @@ def cleanup_old_uploads():
         print(f"Cleaned up {cleaned_count} old upload folders.")
 
 # Setup CORS to allow requests from our frontend
+# Allow local dev and the configured frontend URL
+frontend_url = os.getenv("FRONTEND_URL", "http://localhost:3000")
 origins = [
     "http://localhost:3000",
-    # We will add the deployed frontend URL here later
-    os.getenv("FRONTEND_URL", "https://your-future-frontend-url.onrender.com"),
-]
+    frontend_url
+] if frontend_url != "http://localhost:3000" else ["http://localhost:3000"]
 
+# Optional: You can also just use allow_origins=["*"] for a hackathon, 
+# but restricting it is safer.
 app.add_middleware(
     CORSMiddleware,
     allow_origins=origins,

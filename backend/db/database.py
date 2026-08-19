@@ -1,218 +1,196 @@
-import sqlite3
 import json
 import uuid
 import os
 from datetime import datetime
+from sqlalchemy import create_engine, Column, String, Float, ForeignKey
+from sqlalchemy.orm import declarative_base, sessionmaker, relationship
 from models.schemas import AuditReport, AuditResponse, BuildingResponse, AuditHistoryResponse, AuditFinding
+from dotenv import load_dotenv
 
-DB_PATH = "data/waymark.db"
+load_dotenv()
 
-def get_db():
-    os.makedirs(os.path.dirname(DB_PATH), exist_ok=True)
-    conn = sqlite3.connect(DB_PATH)
-    conn.row_factory = sqlite3.Row
-    return conn
+# Check for DATABASE_URL. If not present, default to local SQLite.
+DATABASE_URL = os.getenv("DATABASE_URL", "sqlite:///./data/waymark.db")
+
+# Render sometimes prefixes with postgres:// instead of postgresql://, SQLAlchemy needs postgresql://
+if DATABASE_URL.startswith("postgres://"):
+    DATABASE_URL = DATABASE_URL.replace("postgres://", "postgresql://", 1)
+
+# SQLite needs check_same_thread=False
+connect_args = {"check_same_thread": False} if DATABASE_URL.startswith("sqlite") else {}
+
+engine = create_engine(DATABASE_URL, connect_args=connect_args)
+SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+
+Base = declarative_base()
+
+class BuildingModel(Base):
+    __tablename__ = "buildings"
+    
+    id = Column(String, primary_key=True, index=True)
+    name = Column(String, nullable=False, index=True)
+    location = Column(String, nullable=True)
+    latitude = Column(Float, nullable=True)
+    longitude = Column(Float, nullable=True)
+    created_at = Column(String, nullable=False)
+    
+    audits = relationship("AuditModel", back_populates="building", order_by="desc(AuditModel.created_at)")
+
+class AuditModel(Base):
+    __tablename__ = "audits"
+    
+    id = Column(String, primary_key=True, index=True)
+    building_id = Column(String, ForeignKey("buildings.id"), nullable=False)
+    score = Column(String, nullable=False)
+    findings = Column(String, nullable=False)
+    checklist_version = Column(String, nullable=False)
+    created_at = Column(String, nullable=False)
+    
+    building = relationship("BuildingModel", back_populates="audits")
 
 def init_db():
-    conn = get_db()
-    cursor = conn.cursor()
-    
-    cursor.execute('''
-    CREATE TABLE IF NOT EXISTS buildings (
-        id TEXT PRIMARY KEY,
-        name TEXT NOT NULL,
-        location TEXT,
-        latitude REAL,
-        longitude REAL,
-        created_at TEXT NOT NULL
-    )
-    ''')
-    
-    # Simple migration to add columns if they don't exist
-    for col, col_type in [("location", "TEXT"), ("latitude", "REAL"), ("longitude", "REAL")]:
-        try:
-            cursor.execute(f"ALTER TABLE buildings ADD COLUMN {col} {col_type}")
-        except sqlite3.OperationalError:
-            pass # Column already exists
-    
-    cursor.execute('''
-    CREATE TABLE IF NOT EXISTS audits (
-        id TEXT PRIMARY KEY,
-        building_id TEXT NOT NULL,
-        score TEXT NOT NULL,
-        findings TEXT NOT NULL,
-        checklist_version TEXT NOT NULL,
-        created_at TEXT NOT NULL,
-        FOREIGN KEY(building_id) REFERENCES buildings(id)
-    )
-    ''')
-    
-    conn.commit()
-    conn.close()
+    if DATABASE_URL.startswith("sqlite"):
+        os.makedirs(os.path.dirname(DATABASE_URL.replace("sqlite:///", "")), exist_ok=True)
+    Base.metadata.create_all(bind=engine)
 
 def save_audit(building_name: str, report: AuditReport, location: str = None) -> AuditResponse:
-    conn = get_db()
-    cursor = conn.cursor()
-    
-    cursor.execute("SELECT id FROM buildings WHERE name = ?", (building_name,))
-    building_row = cursor.fetchone()
-    
-    if building_row:
-        building_id = building_row["id"]
-        # Update location/coords if provided
-        update_query = "UPDATE buildings SET "
-        update_params = []
-        if location:
-            update_query += "location = ?, "
-            update_params.append(location)
-        if report.latitude is not None:
-            update_query += "latitude = ?, "
-            update_params.append(report.latitude)
-        if report.longitude is not None:
-            update_query += "longitude = ?, "
-            update_params.append(report.longitude)
-            
-        if update_params:
-            update_query = update_query.rstrip(", ") + " WHERE id = ?"
-            update_params.append(building_id)
-            cursor.execute(update_query, tuple(update_params))
-    else:
-        building_id = str(uuid.uuid4())
-        cursor.execute(
-            "INSERT INTO buildings (id, name, location, latitude, longitude, created_at) VALUES (?, ?, ?, ?, ?, ?)",
-            (building_id, building_name, location, report.latitude, report.longitude, datetime.now().isoformat())
-        )
+    db = SessionLocal()
+    try:
+        # Find existing building
+        building = db.query(BuildingModel).filter(BuildingModel.name == building_name).first()
         
-    audit_id = str(uuid.uuid4())
-    findings_json = json.dumps([f.model_dump() for f in report.findings])
-    created_at = report.created_at.isoformat()
-    
-    cursor.execute(
-        "INSERT INTO audits (id, building_id, score, findings, checklist_version, created_at) VALUES (?, ?, ?, ?, ?, ?)",
-        (audit_id, building_id, report.score, findings_json, report.checklist_version, created_at)
-    )
-    
-    conn.commit()
-    conn.close()
-    
-    return AuditResponse(
-        id=audit_id,
-        building_id=building_id,
-        building_name=building_name,
-        location=location or report.location,
-        latitude=report.latitude,
-        longitude=report.longitude,
-        score=report.score,
-        findings=report.findings,
-        checklist_version=report.checklist_version,
-        created_at=report.created_at
-    )
+        if building:
+            if location:
+                building.location = location
+            if report.latitude is not None:
+                building.latitude = report.latitude
+            if report.longitude is not None:
+                building.longitude = report.longitude
+        else:
+            building = BuildingModel(
+                id=str(uuid.uuid4()),
+                name=building_name,
+                location=location,
+                latitude=report.latitude,
+                longitude=report.longitude,
+                created_at=datetime.now().isoformat()
+            )
+            db.add(building)
+            db.flush() # Ensure building ID is generated
+            
+        audit = AuditModel(
+            id=str(uuid.uuid4()),
+            building_id=building.id,
+            score=report.score,
+            findings=json.dumps([f.model_dump() for f in report.findings]),
+            checklist_version=report.checklist_version,
+            created_at=report.created_at.isoformat()
+        )
+        db.add(audit)
+        db.commit()
+        
+        return AuditResponse(
+            id=audit.id,
+            building_id=building.id,
+            building_name=building.name,
+            location=building.location,
+            latitude=building.latitude,
+            longitude=building.longitude,
+            score=audit.score,
+            findings=report.findings,
+            checklist_version=audit.checklist_version,
+            created_at=report.created_at
+        )
+    finally:
+        db.close()
 
 def get_audit(audit_id: str) -> AuditResponse:
-    conn = get_db()
-    cursor = conn.cursor()
-    
-    cursor.execute("""
-        SELECT a.*, b.name as building_name, b.location, b.latitude, b.longitude
-        FROM audits a 
-        JOIN buildings b ON a.building_id = b.id 
-        WHERE a.id = ?
-    """, (audit_id,))
-    
-    row = cursor.fetchone()
-    conn.close()
-    
-    if not row:
-        return None
+    db = SessionLocal()
+    try:
+        audit = db.query(AuditModel).filter(AuditModel.id == audit_id).first()
+        if not audit:
+            return None
+            
+        findings_data = json.loads(audit.findings)
+        findings = [AuditFinding(**f) for f in findings_data]
         
-    findings_data = json.loads(row["findings"])
-    findings = [AuditFinding(**f) for f in findings_data]
-    
-    return AuditResponse(
-        id=row["id"],
-        building_id=row["building_id"],
-        building_name=row["building_name"],
-        location=row["location"],
-        latitude=row["latitude"],
-        longitude=row["longitude"],
-        score=row["score"],
-        findings=findings,
-        checklist_version=row["checklist_version"],
-        created_at=datetime.fromisoformat(row["created_at"])
-    )
+        return AuditResponse(
+            id=audit.id,
+            building_id=audit.building_id,
+            building_name=audit.building.name,
+            location=audit.building.location,
+            latitude=audit.building.latitude,
+            longitude=audit.building.longitude,
+            score=audit.score,
+            findings=findings,
+            checklist_version=audit.checklist_version,
+            created_at=datetime.fromisoformat(audit.created_at)
+        )
+    finally:
+        db.close()
 
 def list_buildings() -> list[BuildingResponse]:
-    conn = get_db()
-    cursor = conn.cursor()
-    
-    cursor.execute("""
-        SELECT b.id, b.name, b.location, b.latitude, b.longitude, b.created_at,
-               (SELECT a.score FROM audits a WHERE a.building_id = b.id ORDER BY a.created_at DESC LIMIT 1) as latest_score
-        FROM buildings b
-        ORDER BY b.created_at DESC
-    """)
-    
-    rows = cursor.fetchall()
-    conn.close()
-    
-    return [
-        BuildingResponse(
-            id=row["id"],
-            name=row["name"],
-            location=row["location"],
-            latitude=row["latitude"],
-            longitude=row["longitude"],
-            latest_score=row["latest_score"],
-            created_at=datetime.fromisoformat(row["created_at"])
-        ) for row in rows
-    ]
+    db = SessionLocal()
+    try:
+        buildings = db.query(BuildingModel).order_by(BuildingModel.created_at.desc()).all()
+        results = []
+        for b in buildings:
+            latest_score = b.audits[0].score if b.audits else None
+            results.append(
+                BuildingResponse(
+                    id=b.id,
+                    name=b.name,
+                    location=b.location,
+                    latitude=b.latitude,
+                    longitude=b.longitude,
+                    latest_score=latest_score,
+                    created_at=datetime.fromisoformat(b.created_at)
+                )
+            )
+        return results
+    finally:
+        db.close()
 
 def get_building_history(building_id: str) -> AuditHistoryResponse:
-    conn = get_db()
-    cursor = conn.cursor()
-    
-    cursor.execute("SELECT * FROM buildings WHERE id = ?", (building_id,))
-    b_row = cursor.fetchone()
-    
-    if not b_row:
-        conn.close()
-        return None
+    db = SessionLocal()
+    try:
+        b = db.query(BuildingModel).filter(BuildingModel.id == building_id).first()
+        if not b:
+            return None
+            
+        latest_score = b.audits[0].score if b.audits else None
         
-    cursor.execute("SELECT * FROM audits WHERE building_id = ? ORDER BY created_at DESC", (building_id,))
-    a_rows = cursor.fetchall()
-    conn.close()
-    
-    latest_score = a_rows[0]["score"] if a_rows else None
-    
-    building = BuildingResponse(
-        id=b_row["id"],
-        name=b_row["name"],
-        location=b_row["location"],
-        latitude=b_row["latitude"],
-        longitude=b_row["longitude"],
-        latest_score=latest_score,
-        created_at=datetime.fromisoformat(b_row["created_at"])
-    )
-    
-    history = []
-    for row in a_rows:
-        findings_data = json.loads(row["findings"])
-        findings = [AuditFinding(**f) for f in findings_data]
-        history.append(
-            AuditResponse(
-                id=row["id"],
-                building_id=row["building_id"],
-                building_name=building.name,
-                location=building.location,
-                latitude=building.latitude,
-                longitude=building.longitude,
-                score=row["score"],
-                findings=findings,
-                checklist_version=row["checklist_version"],
-                created_at=datetime.fromisoformat(row["created_at"])
-            )
+        building = BuildingResponse(
+            id=b.id,
+            name=b.name,
+            location=b.location,
+            latitude=b.latitude,
+            longitude=b.longitude,
+            latest_score=latest_score,
+            created_at=datetime.fromisoformat(b.created_at)
         )
         
-    return AuditHistoryResponse(building=building, history=history)
+        history = []
+        for audit in b.audits:
+            findings_data = json.loads(audit.findings)
+            findings = [AuditFinding(**f) for f in findings_data]
+            history.append(
+                AuditResponse(
+                    id=audit.id,
+                    building_id=audit.building_id,
+                    building_name=building.name,
+                    location=building.location,
+                    latitude=building.latitude,
+                    longitude=building.longitude,
+                    score=audit.score,
+                    findings=findings,
+                    checklist_version=audit.checklist_version,
+                    created_at=datetime.fromisoformat(audit.created_at)
+                )
+            )
+            
+        return AuditHistoryResponse(building=building, history=history)
+    finally:
+        db.close()
 
 init_db()

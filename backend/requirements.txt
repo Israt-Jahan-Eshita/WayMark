@@ -7,3 +7,5 @@ python-dotenv
 requests
 pillow
 pytest
+sqlalchemy
+psycopg2-binary

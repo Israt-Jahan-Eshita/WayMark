@@ -15,6 +15,8 @@ from datetime import datetime
 router = APIRouter(prefix="/audit", tags=["Auditing"])
 
 # Simple memory rate limiter: IP -> list of timestamps
+# Note: Resets on redeploy and only works for a single instance.
+# Acceptable for single-instance hackathon demo.
 RATE_LIMIT_DICT = {}
 MAX_REQUESTS_PER_MIN = 5
 MAX_FILE_SIZE = 5 * 1024 * 1024 # 5 MB
