@@ -1,0 +1,47 @@
+{
+  "version": "2026-08-19",
+  "criteria": [
+    {
+      "id": "crit_ramp",
+      "label": "Ramp Access",
+      "category": "entrance",
+      "description": "A ramp is present at the entrance if steps exist."
+    },
+    {
+      "id": "crit_step_free_entrance",
+      "label": "Step-Free Entrance",
+      "category": "entrance",
+      "description": "The main entrance is completely step-free and ground level."
+    },
+    {
+      "id": "crit_wide_doorways",
+      "label": "Wide Doorways",
+      "category": "interior",
+      "description": "Doorways are wide enough for wheelchair access."
+    },
+    {
+      "id": "crit_tactile_paving",
+      "label": "Tactile Paving",
+      "category": "navigation",
+      "description": "Tactile guidance paths or warning surfaces are visible on the floor/ground."
+    },
+    {
+      "id": "crit_accessible_restroom",
+      "label": "Accessible Restroom",
+      "category": "facilities",
+      "description": "An accessible restroom is visible (indicated by signage, grab bars, etc.)."
+    },
+    {
+      "id": "crit_clear_pathways",
+      "label": "Clear Pathways",
+      "category": "interior",
+      "description": "Corridors and pathways are clear of obstacles and wide enough for navigation."
+    },
+    {
+      "id": "crit_braille_signage",
+      "label": "Braille/Tactile Signage",
+      "category": "signage",
+      "description": "Signs include Braille or tactile characters for the visually impaired."
+    }
+  ]
+}
