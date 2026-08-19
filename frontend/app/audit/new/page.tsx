@@ -6,12 +6,15 @@ import { listBuildings, getBuildingHistory } from "@/lib/api";
 import { useRouter } from "next/navigation";
 import UploadModal from "@/components/UploadModal";
 import ReportCard from "@/components/ReportCard";
+import { useLanguage } from "@/components/LanguageContext";
+import VoiceInputButton from "@/components/VoiceInputButton";
 
 export default function SearchAuditPage() {
   const router = useRouter();
   const [buildings, setBuildings] = useState<any[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [loading, setLoading] = useState(true);
+  const { t } = useLanguage();
   
   // Selection states
   const [selectedBuilding, setSelectedBuilding] = useState<any>(null);
@@ -83,13 +86,13 @@ export default function SearchAuditPage() {
           onClick={() => { setSelectedBuilding(null); setSelectedAudit(null); }}
           className="inline-flex items-center gap-2 text-[var(--text-secondary)] hover:text-[var(--color-primary)] transition-colors mb-6 text-sm font-medium"
         >
-          <ArrowLeft className="w-4 h-4" /> Back to Search
+          <ArrowLeft className="w-4 h-4" /> {t("back_to_search", "Back to Search")}
         </button>
 
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
           <div>
-            <h1 className="text-2xl font-bold text-[var(--color-foreground)] mb-1">Previous Audit Record</h1>
-            <p className="text-[var(--text-secondary)] text-sm">Review the most recent inspection for {selectedBuilding.name}.</p>
+            <h1 className="text-2xl font-bold text-[var(--color-foreground)] mb-1">{t("previous_audit_record", "Previous Audit Record")}</h1>
+            <p className="text-[var(--text-secondary)] text-sm">{t("review_inspection", "Review the most recent inspection for")} {selectedBuilding.name}.</p>
           </div>
           
           <button 
@@ -97,19 +100,19 @@ export default function SearchAuditPage() {
             className="neu-btn neu-btn-primary px-4 py-2 text-sm flex items-center gap-2 shrink-0"
           >
             <ImagePlus className="w-4 h-4" />
-            Update Photos & Re-Audit
+            {t("update_photos", "Update Photos & Re-Audit")}
           </button>
         </div>
 
         {loadingHistory ? (
           <div className="neu-panel p-8 text-center text-[var(--text-secondary)] text-sm font-bold animate-pulse">
-            Loading official report...
+            {t("loading_official_report", "Loading official report...")}
           </div>
         ) : selectedAudit ? (
           <ReportCard report={selectedAudit} />
         ) : (
           <div className="neu-panel p-8 text-center text-[var(--color-error)] text-sm font-bold">
-            No previous reports found for this building.
+            {t("no_previous_reports", "No previous reports found for this building.")}
           </div>
         )}
 
@@ -129,29 +132,30 @@ export default function SearchAuditPage() {
   return (
     <div className="w-full max-w-2xl mx-auto py-10 px-4 relative">
       <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="mb-8 text-center">
-        <h1 className="text-3xl font-bold text-[var(--color-foreground)] mb-3">Search Location</h1>
-        <p className="text-[var(--text-secondary)] text-sm">Search for an existing building to update its audit, or add a new one.</p>
+        <h1 className="text-3xl font-bold text-[var(--color-foreground)] mb-3">{t("search_location", "Search Location")}</h1>
+        <p className="text-[var(--text-secondary)] text-sm">{t("search_location_desc", "Search for an existing building to update its audit, or add a new one.")}</p>
       </motion.div>
 
       <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}>
         <div className="neu-panel p-5">
-          <div className="relative mb-4">
+          <div className="relative mb-4 group">
             <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-[var(--text-secondary)] w-5 h-5" />
             <input
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Enter building name..."
-              className="w-full neu-input py-3 pl-12 pr-4 text-base font-medium focus:ring-0"
+              placeholder={t("enter_building_name", "Enter building name...")}
+              className="w-full neu-input py-3 pl-12 pr-10 text-base font-medium focus:ring-0"
               autoFocus
             />
+            <VoiceInputButton onResult={(text) => setSearchQuery(prev => (prev ? prev + " " : "") + text)} />
           </div>
 
           {!loading && searchQuery.trim().length > 0 && (
             <div className="space-y-2 max-h-[50vh] overflow-y-auto pr-2">
               {filteredBuildings.length > 0 ? (
                 <>
-                  <p className="text-[10px] font-bold uppercase tracking-wider text-[var(--text-secondary)] mb-2 px-2 sticky top-0 bg-[var(--bg-color)]/90 backdrop-blur py-1 z-10">Existing Locations</p>
+                  <p className="text-[10px] font-bold uppercase tracking-wider text-[var(--text-secondary)] mb-2 px-2 sticky top-0 bg-[var(--bg-color)]/90 backdrop-blur py-1 z-10">{t("existing_locations", "Existing Locations")}</p>
                   {filteredBuildings.map(b => (
                     <button
                       key={b.id}
@@ -165,7 +169,7 @@ export default function SearchAuditPage() {
                           {b.location && <span className="block text-[11px] text-[var(--text-secondary)]">{b.location}</span>}
                         </div>
                       </div>
-                      <span className="text-[10px] text-[var(--text-secondary)] font-bold shrink-0 bg-black/5 dark:bg-white/5 px-2 py-1 rounded">SCORE: {b.latest_score || "N/A"}</span>
+                      <span className="text-[10px] text-[var(--text-secondary)] font-bold shrink-0 bg-black/5 dark:bg-white/5 px-2 py-1 rounded">{t("score", "SCORE")}: {b.latest_score || t("not_available", "N/A")}</span>
                     </button>
                   ))}
                 </>
@@ -181,8 +185,8 @@ export default function SearchAuditPage() {
                       <Plus className="w-4 h-4" />
                     </div>
                     <div>
-                      <span className="block font-semibold text-sm text-[var(--color-foreground)]">Add New Building</span>
-                      <span className="block text-xs text-[var(--text-secondary)]">Create a new audit profile for "{searchQuery}"</span>
+                      <span className="block font-semibold text-sm text-[var(--color-foreground)]">{t("add_new_building", "Add New Building")}</span>
+                      <span className="block text-xs text-[var(--text-secondary)]">{t("create_new_audit_profile", "Create a new audit profile for")} "{searchQuery}"</span>
                     </div>
                   </button>
                 </div>
@@ -193,7 +197,7 @@ export default function SearchAuditPage() {
           {loading && (
              <div className="text-center py-4 text-[var(--text-secondary)] text-sm font-bold flex justify-center items-center gap-2">
                 <svg className="animate-spin h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
-                Loading buildings...
+                {t("loading_buildings", "Loading buildings...")}
              </div>
           )}
         </div>

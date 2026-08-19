@@ -4,10 +4,12 @@ import { motion } from "framer-motion";
 import { listBuildings } from "@/lib/api";
 import Link from "next/link";
 import { ChevronRight, MapPin } from "lucide-react";
+import { useLanguage } from "./LanguageContext";
 
 export default function ResultsCarousel() {
   const [recentAudits, setRecentAudits] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const { t } = useLanguage();
 
   useEffect(() => {
     listBuildings()
@@ -28,25 +30,25 @@ export default function ResultsCarousel() {
   return (
     <section className="py-8 w-full max-w-5xl mx-auto px-4 overflow-hidden">
       <div className="flex items-center justify-between mb-6">
-        <h2 className="text-xl font-bold text-[var(--color-foreground)]">Recent Locations</h2>
-        <Link href="/buildings" className="text-sm font-semibold text-[var(--color-primary)] hover:underline">View All</Link>
+        <h2 className="text-xl font-bold text-[var(--color-foreground)]">{t("recent_locations", "Recent Locations")}</h2>
+        <Link href="/buildings" className="text-sm font-semibold text-[var(--color-primary)] hover:underline">{t("view_all", "View All")}</Link>
       </div>
       
       <div className="flex flex-nowrap gap-4 overflow-x-auto pb-6 snap-x snap-mandatory hide-scrollbar">
         {recentAudits.map((result, i) => {
           
           // Determine status loosely based on score (e.g. 5/7)
-          let status = "Moderate";
+          let status = t("status_moderate", "Moderate");
           let statusColor = "bg-[var(--color-warning)]/10 text-[var(--color-warning)] border-[var(--color-warning)]/20";
           
           if (result.latest_score) {
             const [num, den] = result.latest_score.split('/').map(Number);
             const ratio = num / (den || 1);
             if (ratio >= 0.8) {
-              status = "Excellent";
+              status = t("status_excellent", "Excellent");
               statusColor = "bg-[var(--color-success)]/10 text-[var(--color-success)] border-[var(--color-success)]/20";
             } else if (ratio < 0.5) {
-              status = "Poor";
+              status = t("status_poor", "Poor");
               statusColor = "bg-[var(--color-error)]/10 text-[var(--color-error)] border-[var(--color-error)]/20";
             }
           }
@@ -74,8 +76,8 @@ export default function ResultsCarousel() {
               
               <div className="flex flex-col gap-2 mb-4">
                 <div className="flex justify-between items-center text-xs">
-                  <span className="text-[var(--text-secondary)]">Score</span>
-                  <span className="text-[var(--color-foreground)] font-bold">{result.latest_score || "N/A"}</span>
+                  <span className="text-[var(--text-secondary)]">{t("score", "Score")}</span>
+                  <span className="text-[var(--color-foreground)] font-bold">{result.latest_score || t("not_available", "N/A")}</span>
                 </div>
                 <div className={`text-[9px] px-2 py-1 rounded font-bold uppercase tracking-wide border text-center ${statusColor}`}>
                   {status}

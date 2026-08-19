@@ -1,8 +1,34 @@
 "use client";
 import { motion } from "framer-motion";
 import Link from "next/link";
+import { useState, useEffect } from "react";
+import { listBuildings } from "@/lib/api";
+import { useLanguage } from "./LanguageContext";
 
 export default function Hero() {
+  const [stats, setStats] = useState({ count: 0, avgScore: 0 });
+  const { t } = useLanguage();
+
+  useEffect(() => {
+    listBuildings().then(data => {
+      if (data && data.length > 0) {
+        let totalScore = 0;
+        let validScores = 0;
+        data.forEach((b: any) => {
+          if (b.latest_score) {
+            const [num, den] = b.latest_score.split('/').map(Number);
+            if (den > 0) {
+              totalScore += (num / den);
+              validScores += 1;
+            }
+          }
+        });
+        const avg = validScores > 0 ? (totalScore / validScores) * 100 : 0;
+        setStats({ count: data.length, avgScore: Math.round(avg) });
+      }
+    }).catch(err => console.error(err));
+  }, []);
+
   return (
     <section className="relative pt-32 pb-12 flex flex-col items-center text-center">
       <motion.h1
@@ -23,17 +49,31 @@ export default function Hero() {
         transition={{ duration: 0.6, delay: 0.1 }}
         className="text-xl md:text-2xl text-[var(--text-secondary)] max-w-2xl mx-auto font-light leading-relaxed mb-10"
       >
-        Upload building photos and let our rule-based AI engine instantly audit physical accessibility with pinpoint accuracy.
+        {t("hero_subtitle", "Upload building photos and let our rule-based AI engine instantly audit physical accessibility with pinpoint accuracy.")}
       </motion.p>
       
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6, delay: 0.2 }}
+        className="flex flex-col items-center gap-6"
       >
         <Link href="/audit/new" className="neu-btn neu-btn-primary px-6 py-3 text-base">
-          Start an audit
+          {t("start_audit", "Start an audit")}
         </Link>
+        
+        {stats.count > 0 && (
+          <div className="flex gap-8 mt-6">
+            <div className="flex flex-col items-center">
+              <span className="text-3xl font-bold font-mono text-[var(--color-primary)]">{stats.count}</span>
+              <span className="text-xs uppercase tracking-wider text-[var(--text-secondary)] font-bold">{t("buildings_audited", "Buildings Audited")}</span>
+            </div>
+            <div className="flex flex-col items-center">
+              <span className="text-3xl font-bold font-mono text-[var(--color-success)]">{stats.avgScore}%</span>
+              <span className="text-xs uppercase tracking-wider text-[var(--text-secondary)] font-bold">{t("avg_accessibility", "Avg. Accessibility")}</span>
+            </div>
+          </div>
+        )}
       </motion.div>
     </section>
   );

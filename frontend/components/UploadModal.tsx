@@ -1,8 +1,12 @@
 "use client";
 import { useState, useEffect } from "react";
+import { createPortal } from "react-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { runAudit } from "@/lib/api";
-import { X } from "lucide-react";
+import { X, MapPin } from "lucide-react";
+import DynamicLocationPicker from "./DynamicLocationPicker";
+import { useLanguage } from "./LanguageContext";
+import VoiceInputButton from "./VoiceInputButton";
 
 interface UploadModalProps {
   isOpen: boolean;
@@ -26,6 +30,8 @@ export default function UploadModal({
   const [location, setLocation] = useState(defaultLocation);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [showMap, setShowMap] = useState(false);
+  const { t } = useLanguage();
 
   // Reset/update state when opened with new props
   useEffect(() => {
@@ -136,9 +142,11 @@ export default function UploadModal({
   };
 
   return (
-    <AnimatePresence>
-      {isOpen && (
-        <div key="upload-modal" className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+    <>
+      {typeof document !== 'undefined' && createPortal(
+        <AnimatePresence>
+          {isOpen && (
+            <div key="upload-modal" className="fixed inset-0 z-[100] flex items-center justify-center p-4">
           {/* Backdrop */}
           <motion.div 
             initial={{ opacity: 0 }}
@@ -170,38 +178,56 @@ export default function UploadModal({
                 
                 <div className="mb-4 pr-6">
                   <h2 className="text-xl font-bold font-serif text-[var(--color-foreground)]">
-                    {isNewBuilding ? "New Location Audit" : "Update Existing Audit"}
+                    {isNewBuilding ? t("new_location_audit", "New Location Audit") : t("update_audit", "Update Existing Audit")}
                   </h2>
                   <p className="text-xs text-[var(--text-secondary)] mb-4 border-b border-dashed border-gray-300 dark:border-gray-600 pb-3">
-                    Attach latest evidence photos for inspection.
+                    {t("attach_evidence", "Attach latest evidence photos for inspection.")}
                   </p>
                 </div>
 
                 <div className="mb-4">
-                  <label className="block text-[var(--color-foreground)] text-[10px] font-bold uppercase tracking-wider mb-1 font-mono">Building Name</label>
-                  <input
-                    type="text"
-                    value={buildingName}
-                    onChange={(e) => setBuildingName(e.target.value)}
-                    readOnly={!isNewBuilding}
-                    placeholder="Official building name..."
-                    className={`w-full text-[var(--color-foreground)] text-sm font-serif bg-[#EBEBEB] dark:bg-[#1A1825] p-2.5 rounded-lg shadow-[inset_2px_2px_4px_rgba(0,0,0,0.1),inset_-2px_-2px_4px_rgba(255,255,255,0.7)] dark:shadow-[inset_2px_2px_4px_rgba(0,0,0,0.5),inset_-2px_-2px_4px_rgba(255,255,255,0.05)] border-transparent focus:outline-none focus:ring-1 focus:ring-[var(--color-primary)] ${!isNewBuilding ? 'opacity-70 cursor-not-allowed' : ''}`}
-                  />
+                  <label className="block text-[var(--color-foreground)] text-[10px] font-bold uppercase tracking-wider mb-1 font-mono">{t("building_name", "Building Name")}</label>
+                  <div className="relative group">
+                    <input
+                      type="text"
+                      value={buildingName}
+                      onChange={(e) => setBuildingName(e.target.value)}
+                      readOnly={!isNewBuilding}
+                      placeholder={t("building_name_placeholder", "Official building name...")}
+                      className={`w-full text-[var(--color-foreground)] text-sm font-serif bg-[#EBEBEB] dark:bg-[#1A1825] py-2.5 pl-3 pr-10 rounded-lg shadow-[inset_2px_2px_4px_rgba(0,0,0,0.1),inset_-2px_-2px_4px_rgba(255,255,255,0.7)] dark:shadow-[inset_2px_2px_4px_rgba(0,0,0,0.5),inset_-2px_-2px_4px_rgba(255,255,255,0.05)] border-transparent focus:outline-none focus:ring-1 focus:ring-[var(--color-primary)] ${!isNewBuilding ? 'opacity-70 cursor-not-allowed' : ''}`}
+                    />
+                    {isNewBuilding && (
+                      <VoiceInputButton onResult={(text) => setBuildingName(prev => (prev ? prev + " " : "") + text)} />
+                    )}
+                  </div>
                 </div>
 
                 <div className="mb-5">
-                  <label className="block text-[var(--color-foreground)] text-[10px] font-bold uppercase tracking-wider mb-1 font-mono">Location / Address</label>
-                  <input
-                    type="text"
-                    value={location}
-                    onChange={(e) => setLocation(e.target.value)}
-                    placeholder="E.g. Dhaka, Bangladesh"
-                    className="w-full text-[var(--color-foreground)] text-sm font-serif bg-[#EBEBEB] dark:bg-[#1A1825] p-2.5 rounded-lg shadow-[inset_2px_2px_4px_rgba(0,0,0,0.1),inset_-2px_-2px_4px_rgba(255,255,255,0.7)] dark:shadow-[inset_2px_2px_4px_rgba(0,0,0,0.5),inset_-2px_-2px_4px_rgba(255,255,255,0.05)] border-transparent focus:outline-none focus:ring-1 focus:ring-[var(--color-primary)]"
-                  />
+                  <label className="block text-[var(--color-foreground)] text-[10px] font-bold uppercase tracking-wider mb-1 font-mono">{t("location_address", "Location / Address")}</label>
+                  <div className="flex gap-2 relative group">
+                    <div className="relative flex-grow group">
+                      <input
+                        type="text"
+                        value={location}
+                        onChange={(e) => setLocation(e.target.value)}
+                        placeholder={t("location_placeholder", "E.g. Dhaka, Bangladesh")}
+                        className="w-full text-[var(--color-foreground)] text-sm font-serif bg-[#EBEBEB] dark:bg-[#1A1825] py-2.5 pl-3 pr-10 rounded-lg shadow-[inset_2px_2px_4px_rgba(0,0,0,0.1),inset_-2px_-2px_4px_rgba(255,255,255,0.7)] dark:shadow-[inset_2px_2px_4px_rgba(0,0,0,0.5),inset_-2px_-2px_4px_rgba(255,255,255,0.05)] border-transparent focus:outline-none focus:ring-1 focus:ring-[var(--color-primary)]"
+                      />
+                      <VoiceInputButton onResult={(text) => setLocation(prev => (prev ? prev + " " : "") + text)} />
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => setShowMap(true)}
+                      className="neu-btn px-3 flex items-center justify-center gap-1 text-xs font-bold font-mono text-[var(--color-primary)] whitespace-nowrap"
+                      title="Pick on Map"
+                    >
+                      <MapPin className="w-4 h-4" />
+                    </button>
+                  </div>
                 </div>
 
                 <div className="mb-6">
-                  <label className="block text-[var(--color-foreground)] text-[10px] font-bold uppercase tracking-wider mb-1 font-mono">Evidence Photos (Max 5)</label>
+                  <label className="block text-[var(--color-foreground)] text-[10px] font-bold uppercase tracking-wider mb-1 font-mono">{t("evidence_photos", "Evidence Photos (Max 5)")}</label>
                   <div className="relative group cursor-pointer neu-input p-1 rounded-lg bg-[#EBEBEB] dark:bg-[#1A1825] shadow-[inset_2px_2px_4px_rgba(0,0,0,0.1),inset_-2px_-2px_4px_rgba(255,255,255,0.7)] dark:shadow-[inset_2px_2px_4px_rgba(0,0,0,0.5),inset_-2px_-2px_4px_rgba(255,255,255,0.05)] border border-transparent">
                     <input 
                       type="file" 
@@ -215,7 +241,7 @@ export default function UploadModal({
                   {files.length > 0 && (
                     <div className="mt-3 flex flex-col gap-3">
                       <p className="text-[var(--color-primary-dark)] text-[10px] font-bold font-mono">
-                        {files.length} FILE(S) ATTACHED
+                        {files.length} {t("files_attached", "FILE(S) ATTACHED")}
                       </p>
                       
                       {/* Image Previews */}
@@ -256,13 +282,13 @@ export default function UploadModal({
                           disabled={loading}
                           className="w-full neu-btn py-2 text-xs font-bold font-mono flex items-center justify-center gap-2 bg-[#EBEBEB] dark:bg-[#1A1825]"
                         >
-                          CREATE COLLAGE (SAVE TOKENS)
+                          {t("create_collage", "CREATE COLLAGE (SAVE TOKENS)")}
                         </button>
                       )}
                       
                       {files.length === 1 && files[0].name === 'collage.jpg' && (
                         <p className="text-[var(--color-success)] text-[10px] font-bold font-mono">
-                          COLLAGE READY FOR UPLOAD
+                          {t("collage_ready", "COLLAGE READY FOR UPLOAD")}
                         </p>
                       )}
                     </div>
@@ -279,9 +305,9 @@ export default function UploadModal({
                   {loading ? (
                     <span className="flex items-center justify-center gap-2">
                       <svg className="animate-spin h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
-                      Processing...
+                      {t("processing", "Processing...")}
                     </span>
-                  ) : (isNewBuilding ? "CREATE & AUDIT" : "UPDATE AUDIT")}
+                  ) : (isNewBuilding ? t("create_and_audit", "CREATE & AUDIT") : t("update_audit", "UPDATE AUDIT"))}
                 </button>
               </form>
 
@@ -293,7 +319,7 @@ export default function UploadModal({
                   disabled={loading}
                   className="w-full neu-btn py-2 px-3 disabled:opacity-50 disabled:cursor-not-allowed text-[10px] font-bold font-mono uppercase tracking-wide bg-[#EBEBEB] dark:bg-[#1A1825] shadow-[2px_2px_4px_rgba(0,0,0,0.1),-2px_-2px_4px_rgba(255,255,255,0.7)] dark:shadow-[2px_2px_4px_rgba(0,0,0,0.5),-2px_-2px_4px_rgba(255,255,255,0.05)] border border-transparent active:shadow-[inset_2px_2px_4px_rgba(0,0,0,0.2),inset_-2px_-2px_4px_rgba(255,255,255,0.5)]"
                 >
-                  REUSE LAST UPLOAD (DEV)
+                  {t("reuse_last", "REUSE LAST UPLOAD (DEV)")}
                 </button>
               </div>
 
@@ -319,6 +345,41 @@ export default function UploadModal({
           />
         </div>
       )}
-    </AnimatePresence>
+
+      {/* Location Picker Map Popup */}
+      {showMap && (
+        <div className="fixed inset-0 z-[200] flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
+          <motion.div 
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.95 }}
+            className="w-full max-w-2xl bg-white dark:bg-[#1A1825] rounded-xl overflow-hidden shadow-2xl flex flex-col relative"
+          >
+            <div className="flex justify-between items-center p-4 border-b border-gray-200 dark:border-gray-800">
+              <h3 className="font-bold font-serif text-[var(--color-foreground)] flex items-center gap-2">
+                <MapPin className="w-5 h-5 text-[var(--color-primary)]" />
+                {t("select_location", "Select Building Location")}
+              </h3>
+              <button 
+                onClick={() => setShowMap(false)}
+                className="w-8 h-8 rounded-full bg-gray-100 hover:bg-gray-200 dark:bg-gray-800 dark:hover:bg-gray-700 flex items-center justify-center text-[var(--color-foreground)] transition-colors"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+            
+            <DynamicLocationPicker 
+              onSelect={(locName, lat, lng) => {
+                setLocation(locName);
+                setShowMap(false);
+              }} 
+            />
+          </motion.div>
+        </div>
+      )}
+      </AnimatePresence>,
+      document.body
+      )}
+    </>
   );
 }

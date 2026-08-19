@@ -1,4 +1,5 @@
 "use client";
+import { createPortal } from "react-dom";
 import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { getBuildingHistory } from "@/lib/api";
@@ -6,10 +7,12 @@ import Link from "next/link";
 import { ArrowLeft, Building2, Calendar, FileText, MapPin, X, ExternalLink } from "lucide-react";
 import { useParams } from "next/navigation";
 import ReportCard from "@/components/ReportCard";
+import { useLanguage } from "@/components/LanguageContext";
 
 export default function BuildingDetailsPage() {
   const params = useParams();
   const id = params?.id as string;
+  const { t } = useLanguage();
   
   const [data, setData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
@@ -38,7 +41,7 @@ export default function BuildingDetailsPage() {
       <div className="w-full max-w-5xl mx-auto pt-32 pb-16 px-6 flex justify-center">
         <span className="flex items-center justify-center gap-3 text-[var(--color-primary)] font-semibold text-lg">
           <svg className="animate-spin h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
-          Loading Building History...
+          {t("loading_building_history", "Loading Building History...")}
         </span>
       </div>
     );
@@ -47,9 +50,9 @@ export default function BuildingDetailsPage() {
   if (error || !data) {
     return (
       <div className="w-full max-w-4xl mx-auto pt-32 pb-12 px-6 text-center">
-        <p className="text-[var(--color-error)] font-medium text-xl mb-6">{error || "Building not found"}</p>
+        <p className="text-[var(--color-error)] font-medium text-xl mb-6">{error || t("building_not_found", "Building not found")}</p>
         <Link href="/buildings" className="neu-btn px-6 py-3 inline-flex items-center gap-2">
-          <ArrowLeft className="w-4 h-4" /> Back to buildings
+          <ArrowLeft className="w-4 h-4" /> {t("back_to_buildings", "Back to buildings")}
         </Link>
       </div>
     );
@@ -58,7 +61,7 @@ export default function BuildingDetailsPage() {
   return (
     <div className="w-full max-w-4xl mx-auto pt-28 pb-16 px-4">
       <Link href="/buildings" className="inline-flex items-center gap-1.5 text-[var(--text-secondary)] hover:text-[var(--color-primary)] transition-colors mb-6 text-sm font-medium">
-        <ArrowLeft className="w-3.5 h-3.5" /> Back to buildings
+        <ArrowLeft className="w-3.5 h-3.5" /> {t("back_to_buildings", "Back to buildings")}
       </Link>
 
       <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="mb-10 neu-panel p-5 flex flex-col md:flex-row justify-between items-start md:items-center">
@@ -70,16 +73,16 @@ export default function BuildingDetailsPage() {
             <h1 className="text-2xl font-bold text-[var(--color-foreground)] mb-1">{data.building.name}</h1>
             <div className="flex items-center gap-3 text-xs text-[var(--text-secondary)] font-medium">
               {data.building.location && <span className="flex items-center gap-1"><MapPin className="w-3 h-3" /> {data.building.location}</span>}
-              <span className="flex items-center gap-1"><Calendar className="w-3 h-3" /> Added: {new Date(data.building.created_at).toLocaleDateString()}</span>
-              <span className="flex items-center gap-1"><FileText className="w-3 h-3" /> {data.history.length} Audits</span>
+              <span className="flex items-center gap-1"><Calendar className="w-3 h-3" /> {t("added", "Added:")} {new Date(data.building.created_at).toLocaleDateString()}</span>
+              <span className="flex items-center gap-1"><FileText className="w-3 h-3" /> {data.history.length} {t("audits", "Audits")}</span>
             </div>
           </div>
         </div>
         
         <div className="mt-4 md:mt-0 bg-[var(--bg-gradient-start)] px-4 py-3 rounded-xl shadow-inner border border-white/10 flex flex-col items-end">
-          <div className="text-[10px] text-[var(--text-secondary)] uppercase tracking-widest font-bold mb-0.5">Latest Score</div>
+          <div className="text-[10px] text-[var(--text-secondary)] uppercase tracking-widest font-bold mb-0.5">{t("latest_score", "Latest Score")}</div>
           <div className="text-2xl font-black text-transparent bg-clip-text bg-gradient-to-r from-[var(--color-primary-dark)] to-[var(--color-secondary-dark)]">
-            {data.building.latest_score || "N/A"}
+            {data.building.latest_score || t("not_available", "N/A")}
           </div>
         </div>
       </motion.div>
@@ -107,8 +110,8 @@ export default function BuildingDetailsPage() {
                 className="w-full text-left neu-panel p-4 hover:border-[var(--color-primary)]/50 transition-colors flex items-center justify-between"
               >
                 <div>
-                  <h3 className="font-bold text-sm text-[var(--color-foreground)]">Official Inspection Report</h3>
-                  <p className="text-xs text-[var(--text-secondary)] mt-1">Score: {audit.score}</p>
+                  <h3 className="font-bold text-sm text-[var(--color-foreground)]">{t("official_inspection_report", "Official Inspection Report")}</h3>
+                  <p className="text-xs text-[var(--text-secondary)] mt-1">{t("score", "Score")}: {audit.score}</p>
                 </div>
                 <div className="w-8 h-8 rounded-full bg-[var(--bg-color)] flex items-center justify-center text-[var(--color-primary)] shadow-[inset_2px_2px_4px_rgba(0,0,0,0.05),inset_-2px_-2px_4px_rgba(255,255,255,0.5)]">
                   <ExternalLink className="w-4 h-4" />
@@ -120,8 +123,8 @@ export default function BuildingDetailsPage() {
         ))}
       </div>
 
-      <AnimatePresence>
-        {selectedAudit && (
+      {typeof document !== 'undefined' && selectedAudit && createPortal(
+        <AnimatePresence>
           <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4">
             <motion.div 
               initial={{ opacity: 0 }}
@@ -149,8 +152,9 @@ export default function BuildingDetailsPage() {
               </div>
             </motion.div>
           </div>
-        )}
-      </AnimatePresence>
+        </AnimatePresence>,
+        document.body
+      )}
     </div>
   );
 }

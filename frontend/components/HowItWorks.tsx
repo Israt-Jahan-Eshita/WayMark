@@ -1,26 +1,29 @@
 "use client";
 import { motion } from "framer-motion";
 import { UploadCloud, CheckCircle2, FileText } from "lucide-react";
-
-const steps = [
-  {
-    icon: <UploadCloud className="w-8 h-8 text-[var(--color-primary)]" />,
-    title: "1. Upload Photos",
-    description: "Snap and upload photos of building entrances, ramps, and facilities.",
-  },
-  {
-    icon: <CheckCircle2 className="w-8 h-8 text-[var(--color-secondary-dark)]" />,
-    title: "2. AI Analysis",
-    description: "Our vision model instantly detects key accessibility features and flags barriers.",
-  },
-  {
-    icon: <FileText className="w-8 h-8 text-[var(--color-primary-dark)]" />,
-    title: "3. Get Report",
-    description: "Receive a detailed compliance score and an actionable audit report.",
-  },
-];
+import { useLanguage } from "./LanguageContext";
 
 export default function HowItWorks() {
+  const { t } = useLanguage();
+  
+  const steps = [
+    {
+      icon: <UploadCloud className="w-8 h-8 text-[var(--color-primary)]" />,
+      title: t("step_1_title", "1. Upload Photos"),
+      description: t("step_1_desc", "Snap and upload photos of building entrances, ramps, and facilities."),
+    },
+    {
+      icon: <CheckCircle2 className="w-8 h-8 text-[var(--color-secondary-dark)]" />,
+      title: t("step_2_title", "2. AI Analysis"),
+      description: t("step_2_desc", "Our vision model instantly detects key accessibility features and flags barriers."),
+    },
+    {
+      icon: <FileText className="w-8 h-8 text-[var(--color-primary-dark)]" />,
+      title: t("step_3_title", "3. Get Report"),
+      description: t("step_3_desc", "Receive a detailed compliance score and an actionable audit report."),
+    },
+  ];
+
   return (
     <section className="py-20 w-full max-w-6xl mx-auto px-6">
       <motion.div
@@ -30,10 +33,10 @@ export default function HowItWorks() {
         className="text-center mb-16"
       >
         <h2 className="text-3xl md:text-4xl font-bold mb-4 text-[var(--color-foreground)]">
-          How It Works
+          {t("how_it_works_title", "How It Works")}
         </h2>
         <p className="text-[var(--text-secondary)] text-lg max-w-2xl mx-auto">
-          Three simple steps to generate a professional accessibility audit.
+          {t("how_it_works_desc", "Three simple steps to generate a professional accessibility audit.")}
         </p>
       </motion.div>
 

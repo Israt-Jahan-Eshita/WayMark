@@ -1,4 +1,4 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 from enum import Enum
 from typing import List, Optional
 from datetime import datetime
@@ -12,6 +12,7 @@ class ExtractedFeature(BaseModel):
     feature_name: str
     status: FeatureStatus
     confidence_note: Optional[str] = None
+    confidence_note_bn: Optional[str] = None
     source_photo_index: int
 
 class ExtractionResult(BaseModel):
@@ -33,14 +34,17 @@ class AuditFinding(BaseModel):
     result: AuditResult
     evidence_photo_index: Optional[int] = None
     note: str
+    note_bn: Optional[str] = None
 
 class AuditReport(BaseModel):
     building_name: str
     location: Optional[str] = None
+    latitude: Optional[float] = None
+    longitude: Optional[float] = None
     score: str
     findings: List[AuditFinding]
     checklist_version: str
-    created_at: datetime
+    created_at: datetime = Field(default_factory=datetime.now)
 
 class AuditResponse(AuditReport):
     id: str
@@ -50,6 +54,8 @@ class BuildingResponse(BaseModel):
     id: str
     name: str
     location: Optional[str] = None
+    latitude: Optional[float] = None
+    longitude: Optional[float] = None
     latest_score: Optional[str] = None
     created_at: datetime
 

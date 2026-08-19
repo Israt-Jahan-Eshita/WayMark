@@ -22,15 +22,18 @@ def init_db():
         id TEXT PRIMARY KEY,
         name TEXT NOT NULL,
         location TEXT,
+        latitude REAL,
+        longitude REAL,
         created_at TEXT NOT NULL
     )
     ''')
     
-    # Simple migration to add location if it doesn't exist
-    try:
-        cursor.execute("ALTER TABLE buildings ADD COLUMN location TEXT")
-    except sqlite3.OperationalError:
-        pass # Column already exists
+    # Simple migration to add columns if they don't exist
+    for col, col_type in [("location", "TEXT"), ("latitude", "REAL"), ("longitude", "REAL")]:
+        try:
+            cursor.execute(f"ALTER TABLE buildings ADD COLUMN {col} {col_type}")
+        except sqlite3.OperationalError:
+            pass # Column already exists
     
     cursor.execute('''
     CREATE TABLE IF NOT EXISTS audits (
@@ -56,14 +59,28 @@ def save_audit(building_name: str, report: AuditReport, location: str = None) ->
     
     if building_row:
         building_id = building_row["id"]
-        # Update location if provided
+        # Update location/coords if provided
+        update_query = "UPDATE buildings SET "
+        update_params = []
         if location:
-            cursor.execute("UPDATE buildings SET location = ? WHERE id = ?", (location, building_id))
+            update_query += "location = ?, "
+            update_params.append(location)
+        if report.latitude is not None:
+            update_query += "latitude = ?, "
+            update_params.append(report.latitude)
+        if report.longitude is not None:
+            update_query += "longitude = ?, "
+            update_params.append(report.longitude)
+            
+        if update_params:
+            update_query = update_query.rstrip(", ") + " WHERE id = ?"
+            update_params.append(building_id)
+            cursor.execute(update_query, tuple(update_params))
     else:
         building_id = str(uuid.uuid4())
         cursor.execute(
-            "INSERT INTO buildings (id, name, location, created_at) VALUES (?, ?, ?, ?)",
-            (building_id, building_name, location, datetime.now().isoformat())
+            "INSERT INTO buildings (id, name, location, latitude, longitude, created_at) VALUES (?, ?, ?, ?, ?, ?)",
+            (building_id, building_name, location, report.latitude, report.longitude, datetime.now().isoformat())
         )
         
     audit_id = str(uuid.uuid4())
@@ -83,6 +100,8 @@ def save_audit(building_name: str, report: AuditReport, location: str = None) ->
         building_id=building_id,
         building_name=building_name,
         location=location or report.location,
+        latitude=report.latitude,
+        longitude=report.longitude,
         score=report.score,
         findings=report.findings,
         checklist_version=report.checklist_version,
@@ -94,7 +113,7 @@ def get_audit(audit_id: str) -> AuditResponse:
     cursor = conn.cursor()
     
     cursor.execute("""
-        SELECT a.*, b.name as building_name, b.location 
+        SELECT a.*, b.name as building_name, b.location, b.latitude, b.longitude
         FROM audits a 
         JOIN buildings b ON a.building_id = b.id 
         WHERE a.id = ?
@@ -114,6 +133,8 @@ def get_audit(audit_id: str) -> AuditResponse:
         building_id=row["building_id"],
         building_name=row["building_name"],
         location=row["location"],
+        latitude=row["latitude"],
+        longitude=row["longitude"],
         score=row["score"],
         findings=findings,
         checklist_version=row["checklist_version"],
@@ -125,7 +146,7 @@ def list_buildings() -> list[BuildingResponse]:
     cursor = conn.cursor()
     
     cursor.execute("""
-        SELECT b.id, b.name, b.location, b.created_at,
+        SELECT b.id, b.name, b.location, b.latitude, b.longitude, b.created_at,
                (SELECT a.score FROM audits a WHERE a.building_id = b.id ORDER BY a.created_at DESC LIMIT 1) as latest_score
         FROM buildings b
         ORDER BY b.created_at DESC
@@ -139,6 +160,8 @@ def list_buildings() -> list[BuildingResponse]:
             id=row["id"],
             name=row["name"],
             location=row["location"],
+            latitude=row["latitude"],
+            longitude=row["longitude"],
             latest_score=row["latest_score"],
             created_at=datetime.fromisoformat(row["created_at"])
         ) for row in rows

@@ -73,6 +73,7 @@ def extract_features(image_paths: List[str]) -> ExtractionResult:
                 "feature_name": "{feature_names[0] if feature_names else 'Ramp'}",
                 "status": "detected",
                 "confidence_note": "A clear concrete ramp is visible at the main entrance.",
+                "confidence_note_bn": "প্রধান প্রবেশদ্বারে একটি পরিষ্কার কংক্রিটের র‍্যাম্প দৃশ্যমান।",
                 "source_photo_index": 0
             }}
         ]

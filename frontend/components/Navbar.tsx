@@ -4,6 +4,7 @@ import { usePathname } from "next/navigation";
 import { motion, useScroll, useMotionValueEvent } from "framer-motion";
 import { Home, PlusCircle, Building2, Info, Menu, X } from "lucide-react";
 import { useState } from "react";
+import { useLanguage } from "./LanguageContext";
 
 export default function Navbar() {
   const pathname = usePathname();
@@ -11,6 +12,7 @@ export default function Navbar() {
   const { scrollY } = useScroll();
   const [hidden, setHidden] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
+  const { language, toggleLanguage, t } = useLanguage();
 
   // Hidden strictly on landing page
   const isLandingPage = pathname === "/";
@@ -26,10 +28,10 @@ export default function Navbar() {
   });
 
   const navLinks = [
-    { name: "Home", href: "/", icon: <Home className="w-4 h-4" /> },
-    { name: "Search & Add", href: "/audit/new", icon: <PlusCircle className="w-4 h-4" /> },
-    { name: "Buildings", href: "/buildings", icon: <Building2 className="w-4 h-4" /> },
-    { name: "About", href: "/about", icon: <Info className="w-4 h-4" /> },
+    { key: "home", defaultName: "Home", href: "/", icon: <Home className="w-4 h-4" /> },
+    { key: "start_audit", defaultName: "Search & Add", href: "/audit/new", icon: <PlusCircle className="w-4 h-4" /> },
+    { key: "browse", defaultName: "Buildings", href: "/buildings", icon: <Building2 className="w-4 h-4" /> },
+    { key: "about", defaultName: "About", href: "/about", icon: <Info className="w-4 h-4" /> },
   ];
 
   if (isLandingPage) return null;
@@ -48,7 +50,7 @@ export default function Navbar() {
         }}
         animate={hidden ? "hidden" : "visible"}
         transition={{ duration: 0.35, ease: "easeInOut" }}
-        className="fixed top-0 left-0 right-0 z-50 px-6 py-4"
+        className="fixed top-0 left-0 right-0 z-50 px-6 py-4 print:hidden"
         onMouseEnter={() => { setHidden(false); setIsHovered(true); }}
         onMouseLeave={() => setIsHovered(false)}
       >
@@ -64,40 +66,60 @@ export default function Navbar() {
         </Link>
 
         {/* Desktop Nav */}
-        <nav className="hidden md:flex items-center gap-2">
-          {navLinks.map((link) => {
-            const isActive = pathname === link.href || (link.href !== "/" && pathname.startsWith(link.href));
-            return (
-              <Link
-                key={link.name}
-                href={link.href}
-                className={`relative px-4 py-2 rounded-xl text-sm font-bold flex items-center gap-2 transition-all ${
-                  isActive 
-                    ? "text-[var(--color-primary-dark)] bg-[var(--color-primary)]/10" 
-                    : "text-[var(--text-secondary)] hover:text-[var(--color-foreground)] hover:bg-[var(--glass-bg)]"
-                }`}
-              >
-                {link.icon}
-                {link.name}
-                {isActive && (
-                  <motion.div
-                    layoutId="navbar-active"
-                    className="absolute inset-0 rounded-xl border border-[var(--color-primary)]/30"
-                    transition={{ type: "spring", stiffness: 300, damping: 30 }}
-                  />
-                )}
-              </Link>
-            );
-          })}
-        </nav>
+        <div className="hidden md:flex items-center gap-4">
+          <nav className="flex items-center gap-2">
+            {navLinks.map((link) => {
+              const isActive = pathname === link.href || (link.href !== "/" && pathname.startsWith(link.href));
+              const displayName = t(link.key, link.defaultName);
+              return (
+                <Link
+                  key={link.key}
+                  href={link.href}
+                  className={`relative px-4 py-2 rounded-xl text-sm font-bold flex items-center gap-2 transition-all ${
+                    isActive 
+                      ? "text-[var(--color-primary-dark)] bg-[var(--color-primary)]/10" 
+                      : "text-[var(--text-secondary)] hover:text-[var(--color-foreground)] hover:bg-[var(--glass-bg)]"
+                  }`}
+                >
+                  {link.icon}
+                  {displayName}
+                  {isActive && (
+                    <motion.div
+                      layoutId="navbar-active"
+                      className="absolute inset-0 rounded-xl border border-[var(--color-primary)]/30"
+                      transition={{ type: "spring", stiffness: 300, damping: 30 }}
+                    />
+                  )}
+                </Link>
+              );
+            })}
+          </nav>
+          
+          <div className="w-px h-6 bg-gray-300 dark:bg-gray-700 mx-1"></div>
+          
+          <button 
+            onClick={toggleLanguage}
+            className="neu-btn px-3 py-1.5 text-xs font-bold rounded-lg uppercase"
+          >
+            {language === 'en' ? 'বাংলা' : 'EN'}
+          </button>
+        </div>
 
-        {/* Mobile Menu Toggle */}
-        <button 
-          className="md:hidden p-2 text-[var(--text-secondary)]"
-          onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-        >
-          {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
-        </button>
+        {/* Mobile Menu Toggle & Lang */}
+        <div className="md:hidden flex items-center gap-3">
+          <button 
+            onClick={toggleLanguage}
+            className="neu-btn px-3 py-1.5 text-xs font-bold rounded-lg uppercase"
+          >
+            {language === 'en' ? 'বাংলা' : 'EN'}
+          </button>
+          <button 
+            className="p-2 text-[var(--text-secondary)]"
+            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+          >
+            {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+          </button>
+        </div>
       </div>
 
       {/* Mobile Nav Dropdown */}
@@ -109,9 +131,10 @@ export default function Navbar() {
         >
           {navLinks.map((link) => {
             const isActive = pathname === link.href || (link.href !== "/" && pathname.startsWith(link.href));
+            const displayName = t(link.key, link.defaultName);
             return (
               <Link
-                key={link.name}
+                key={link.key}
                 href={link.href}
                 onClick={() => setMobileMenuOpen(false)}
                 className={`px-4 py-3 rounded-xl text-base font-bold flex items-center gap-3 transition-all ${
@@ -121,7 +144,7 @@ export default function Navbar() {
                 }`}
               >
                 {link.icon}
-                {link.name}
+                {displayName}
               </Link>
             );
           })}
