@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import { Inter, Playfair_Display, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
-import { Toaster } from "react-hot-toast";
 import Navbar from "@/components/Navbar";
 import Chatbot from "@/components/Chatbot";
 import { AuthProvider } from "@/components/AuthProvider";
