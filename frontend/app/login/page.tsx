@@ -6,6 +6,8 @@ import { motion } from "framer-motion";
 
 export default function LoginPage() {
   const { login } = useAuth();
+  const [isSignUp, setIsSignUp] = useState(false);
+  const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
@@ -21,7 +23,7 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center relative z-20 px-4 pt-10">
+    <div className="min-h-screen flex items-center justify-center relative z-20 px-4 pt-10 pb-20">
       <motion.div 
         initial={{ opacity: 0, scale: 0.95, y: 20 }}
         animate={{ opacity: 1, scale: 1, y: 0 }}
@@ -33,11 +35,28 @@ export default function LoginPage() {
             <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-[var(--color-primary)] to-[var(--color-primary-dark)] flex items-center justify-center text-white shadow-lg mb-4">
               <Building2 className="w-8 h-8" />
             </div>
-            <h1 className="text-2xl font-bold font-serif text-[var(--color-foreground)]">WayMark Auth</h1>
-            <p className="text-sm text-[var(--text-secondary)] mt-2">Sign in to access accessibility auditing tools.</p>
+            <h1 className="text-2xl font-bold font-serif text-[var(--color-foreground)]">
+              {isSignUp ? "Create Account" : "WayMark Auth"}
+            </h1>
+            <p className="text-sm text-[var(--text-secondary)] mt-2">
+              {isSignUp ? "Sign up to start auditing accessibility." : "Sign in to access accessibility auditing tools."}
+            </p>
           </div>
 
-          <form onSubmit={handleLogin} className="space-y-5 text-left">
+          <form onSubmit={handleLogin} className="space-y-4 text-left">
+            {isSignUp && (
+              <div>
+                <label className="block text-[var(--color-foreground)] text-[10px] font-bold uppercase tracking-wider mb-2 font-mono">Full Name</label>
+                <input
+                  type="text"
+                  required
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  placeholder="Jane Doe"
+                  className="w-full text-[var(--color-foreground)] text-sm font-serif bg-[var(--bg-gradient-start)] p-3 rounded-xl shadow-[inset_2px_2px_4px_rgba(0,0,0,0.1),inset_-2px_-2px_4px_rgba(255,255,255,0.7)] dark:shadow-[inset_2px_2px_4px_rgba(0,0,0,0.5),inset_-2px_-2px_4px_rgba(255,255,255,0.05)] border-transparent focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]"
+                />
+              </div>
+            )}
             <div>
               <label className="block text-[var(--color-foreground)] text-[10px] font-bold uppercase tracking-wider mb-2 font-mono">Email Address</label>
               <input
@@ -64,11 +83,21 @@ export default function LoginPage() {
             <button 
               type="submit" 
               disabled={loading}
-              className="w-full mt-4 neu-btn bg-[var(--bg-gradient-start)] py-3 px-4 text-sm disabled:opacity-50 font-bold tracking-wide flex items-center justify-center gap-2 text-[var(--text-secondary)] hover:text-[var(--color-foreground)]"
+              className="w-full mt-6 neu-btn bg-[var(--bg-gradient-start)] py-3 px-4 text-sm disabled:opacity-50 font-bold tracking-wide flex items-center justify-center gap-2 text-[var(--text-secondary)] hover:text-[var(--color-foreground)]"
             >
-              {loading ? "AUTHENTICATING..." : "SIGN IN"}
+              {loading ? "AUTHENTICATING..." : (isSignUp ? "CREATE ACCOUNT" : "SIGN IN")}
             </button>
           </form>
+
+          <div className="mt-6 text-sm text-[var(--text-secondary)]">
+            {isSignUp ? "Already have an account? " : "Don't have an account? "}
+            <button 
+              onClick={() => setIsSignUp(!isSignUp)}
+              className="text-[var(--color-primary)] font-bold hover:underline"
+            >
+              {isSignUp ? "Sign In" : "Sign Up"}
+            </button>
+          </div>
 
           <div className="mt-8 pt-6 border-t border-dashed border-gray-300 dark:border-gray-700">
             <p className="text-xs text-[var(--text-secondary)] mb-4">Or use demo access for presentation</p>
