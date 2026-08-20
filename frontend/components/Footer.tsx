@@ -1,5 +1,4 @@
 import Link from "next/link";
-import { Github } from "lucide-react";
 
 export default function Footer() {
   return (
@@ -19,8 +18,10 @@ export default function Footer() {
             <p className="text-[var(--text-secondary)] text-sm leading-relaxed mb-6 max-w-md">
               WayMark AI is an automated physical accessibility auditing platform. We help civil engineers, city planners, and accessibility advocates quickly verify building compliance using AI vision models.
             </p>
-            <div className="flex items-center gap-4 text-[var(--text-secondary)]">
-              <a href="#" className="hover:text-[var(--color-primary)] transition-colors"><Github className="w-5 h-5" /></a>
+            <div className="flex items-center gap-4 text-[var(--text-secondary)] font-bold text-sm">
+              <a href="#" className="hover:text-[var(--color-primary)] transition-colors">GitHub</a>
+              <a href="#" className="hover:text-[var(--color-primary)] transition-colors">LinkedIn</a>
+              <a href="#" className="hover:text-[var(--color-primary)] transition-colors">Twitter</a>
             </div>
           </div>
 
