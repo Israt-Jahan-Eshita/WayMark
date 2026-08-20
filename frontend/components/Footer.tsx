@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Github, Linkedin } from "lucide-react";
+import { Github } from "lucide-react";
 
 export default function Footer() {
   return (
@@ -21,7 +21,6 @@ export default function Footer() {
             </p>
             <div className="flex items-center gap-4 text-[var(--text-secondary)]">
               <a href="#" className="hover:text-[var(--color-primary)] transition-colors"><Github className="w-5 h-5" /></a>
-              <a href="#" className="hover:text-[var(--color-primary)] transition-colors"><Linkedin className="w-5 h-5" /></a>
             </div>
           </div>
 
