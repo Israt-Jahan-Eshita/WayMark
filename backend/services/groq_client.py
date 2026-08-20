@@ -144,3 +144,47 @@ def extract_features(image_paths: List[str]) -> ExtractionResult:
                 time.sleep(2)  # Wait before retrying
                 continue
             raise RuntimeError(f"Failed to extract features from Groq API after {max_retries + 1} attempts: {str(e)}")
+
+def chat_with_system(user_messages: List[dict]) -> str:
+    """
+    Handles chatbot conversations restricted to WayMark AI and accessibility.
+    """
+    system_prompt = """
+    You are the 'WayMark AI Assistant', an expert on physical accessibility and the WayMark AI platform.
+    
+    CRITICAL RULES:
+    1. You must ONLY answer questions related to:
+       - Physical accessibility standards (e.g., WHO guidelines, ramps, doorways, tactile paving, etc.)
+       - How the WayMark AI system works (it uses vision models to extract visible accessibility features from uploaded building photos and compares them to a standard checklist).
+       - The purpose of WayMark AI (to verify accessibility claims using visual evidence rather than assumptions).
+    2. If the user asks about ANYTHING ELSE (e.g., coding, general knowledge, weather, math, other AI models), you MUST politely decline and say: "I am the WayMark AI Assistant. I can only answer questions related to physical accessibility and the WayMark platform."
+    3. Keep your answers concise, helpful, and professional.
+    4. Do NOT output <think> blocks.
+    """
+    
+    # Format messages for Groq
+    messages = [
+        {"role": "system", "content": system_prompt}
+    ]
+    
+    # Add user history
+    for msg in user_messages:
+        # Ensure only role and content are passed
+        messages.append({
+            "role": msg.get("role", "user"),
+            "content": msg.get("content", "")
+        })
+        
+    try:
+        chat_completion = client.chat.completions.create(
+            messages=messages,
+            model="llama-3.1-8b-instant", # Using a faster/cheaper model for chat
+            temperature=0.3,
+            max_tokens=1024
+        )
+        
+        result_text = chat_completion.choices[0].message.content
+        return result_text.strip()
+    except Exception as e:
+        print(f"Chatbot Error: {e}")
+        raise RuntimeError("I'm having trouble connecting to my servers right now. Please try again later.")

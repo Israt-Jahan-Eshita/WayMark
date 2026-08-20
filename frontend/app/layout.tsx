@@ -1,9 +1,12 @@
 import type { Metadata } from "next";
 import { Inter, Playfair_Display, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
+import { Toaster } from "react-hot-toast";
 import Navbar from "@/components/Navbar";
+import Chatbot from "@/components/Chatbot";
 import { AuthProvider } from "@/components/AuthProvider";
 import { LanguageProvider } from "@/components/LanguageContext";
+import "leaflet/dist/leaflet.css";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
 const playfair = Playfair_Display({ subsets: ["latin"], variable: "--font-playfair" });
@@ -34,6 +37,8 @@ export default function RootLayout({
             <main className="flex-grow pt-20 relative z-[5]">
               {children}
             </main>
+            
+            <Chatbot />
           </LanguageProvider>
         </AuthProvider>
       </body>
