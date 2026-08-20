@@ -213,9 +213,16 @@ body {
   background-size: cover;
   background-position: center bottom;
   background-repeat: no-repeat;
-  opacity: 0.6;
-  filter: blur(0px);
+  opacity: 0.15;
+  mix-blend-mode: multiply;
   pointer-events: none;
+  z-index: 0;
+}
+
+.dark .bg-mesh::after {
+  opacity: 0.05;
+  mix-blend-mode: screen;
+  filter: invert(1);
 }
 
 @media (prefers-color-scheme: dark) {
