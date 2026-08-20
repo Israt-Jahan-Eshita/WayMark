@@ -38,11 +38,11 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Registering the routers that we will create in the next step
-app.include_router(extract.router, prefix="/extract", tags=["Extraction"])
-app.include_router(audit.router, prefix="/audit", tags=["Audit"])
-app.include_router(buildings.router, prefix="/buildings", tags=["Buildings"])
-app.include_router(chat.router, prefix="/chat", tags=["Chat"])
+# Registering the routers
+app.include_router(extract.router)
+app.include_router(audit.router)
+app.include_router(buildings.router)
+app.include_router(chat.router)
 
 @app.get("/health")
 def health_check():

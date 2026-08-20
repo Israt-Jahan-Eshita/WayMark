@@ -3,7 +3,7 @@ from pydantic import BaseModel
 from typing import List
 from services.groq_client import chat_with_system
 
-router = APIRouter()
+router = APIRouter(prefix="/chat", tags=["Chat"])
 
 class ChatMessage(BaseModel):
     role: str
