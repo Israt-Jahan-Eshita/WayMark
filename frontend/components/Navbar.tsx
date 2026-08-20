@@ -6,6 +6,8 @@ import { Home, PlusCircle, Building2, Info, Menu, X } from "lucide-react";
 import { useState } from "react";
 import { useLanguage } from "./LanguageContext";
 import { useAuth } from "./AuthProvider";
+import { useTheme } from "./ThemeContext";
+import { Moon, Sun } from "lucide-react";
 
 export default function Navbar() {
   const pathname = usePathname();
@@ -15,6 +17,7 @@ export default function Navbar() {
   const [isHovered, setIsHovered] = useState(false);
   const { language, toggleLanguage, t } = useLanguage();
   const { isAuthenticated, logout } = useAuth();
+  const { theme, toggleTheme } = useTheme();
 
   // Hidden strictly on landing page
   const isLandingPage = pathname === "/";
@@ -99,6 +102,13 @@ export default function Navbar() {
           
           <div className="w-px h-6 bg-gray-300 dark:bg-gray-700 mx-1"></div>
           
+          <button
+            onClick={toggleTheme}
+            className="p-2 text-[var(--text-secondary)] hover:bg-[var(--glass-bg)] hover:text-[var(--color-primary)] rounded-lg transition-colors"
+          >
+            {theme === 'dark' ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
+          </button>
+
           <button 
             onClick={toggleLanguage}
             className="neu-btn px-3 py-1.5 text-xs font-bold rounded-lg uppercase"
@@ -118,6 +128,12 @@ export default function Navbar() {
 
         {/* Mobile Menu Toggle & Lang */}
         <div className="md:hidden flex items-center gap-3">
+          <button
+            onClick={toggleTheme}
+            className="p-1 text-[var(--text-secondary)] hover:text-[var(--color-primary)] transition-colors"
+          >
+            {theme === 'dark' ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
+          </button>
           <button 
             onClick={toggleLanguage}
             className="neu-btn px-3 py-1.5 text-xs font-bold rounded-lg uppercase"

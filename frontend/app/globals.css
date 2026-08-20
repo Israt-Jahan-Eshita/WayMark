@@ -29,34 +29,32 @@
   --neu-shadow-dark: rgba(71, 85, 105, 0.25);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --bg-color: #000000; /* pure black */
-    --bg-gradient-start: #000000; /* pure black */
-    --bg-gradient-end: #000000; /* pure black */
-    
-    --text-primary: #F8FAFC; /* slate-50 */
-    --text-secondary: #94A3B8; /* slate-400 */
-    
-    --primary-accent: #64748B; /* slate-500 */
-    --primary-accent-dark: #475569; /* slate-600 */
-    
-    --secondary-accent: #475569;
-    --secondary-accent-dark: #334155;
-    
-    --success: #8FD9B8;
-    --warning: #DEAA88; 
-    --error: #E58282; 
-    
-    /* Glassmorphism */
-    --glass-bg: rgba(0, 0, 0, 0.35); /* pure black rgb */
-    --glass-border: rgba(148, 163, 184, 0.15); /* slate-400 rgb */
-    --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
-    
-    /* Neumorphism */
-    --neu-shadow-light: rgba(255, 255, 255, 0.02);
-    --neu-shadow-dark: rgba(0, 0, 0, 0.5);
-  }
+html.dark {
+  --bg-color: #000000; /* pure black */
+  --bg-gradient-start: #000000; /* pure black */
+  --bg-gradient-end: #000000; /* pure black */
+  
+  --text-primary: #F8FAFC; /* slate-50 */
+  --text-secondary: #94A3B8; /* slate-400 */
+  
+  --primary-accent: #64748B; /* slate-500 */
+  --primary-accent-dark: #475569; /* slate-600 */
+  
+  --secondary-accent: #475569;
+  --secondary-accent-dark: #334155;
+  
+  --success: #8FD9B8;
+  --warning: #DEAA88; 
+  --error: #E58282; 
+  
+  /* Glassmorphism */
+  --glass-bg: rgba(0, 0, 0, 0.35); /* pure black rgb */
+  --glass-border: rgba(148, 163, 184, 0.15); /* slate-400 rgb */
+  --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+  
+  /* Neumorphism */
+  --neu-shadow-light: rgba(255, 255, 255, 0.02);
+  --neu-shadow-dark: rgba(0, 0, 0, 0.5);
 }
 
 @theme inline {
@@ -110,13 +108,11 @@ body {
   box-shadow: 16px 16px 32px var(--neu-shadow-dark), -16px -16px 32px var(--neu-shadow-light);
 }
 
-@media (prefers-color-scheme: dark) {
-  .glass-panel:hover {
-    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.6);
-  }
-  .neu-panel {
-    border: 1px solid rgba(255, 255, 255, 0.05);
-  }
+html.dark .glass-panel:hover {
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.6);
+}
+html.dark .neu-panel {
+  border: 1px solid rgba(255, 255, 255, 0.05);
 }
 
 /* Neumorphism Button */
@@ -168,14 +164,12 @@ body {
   animation: none; /* Pause on hover for interaction clarity */
 }
 
-@media (prefers-color-scheme: dark) {
-    .neu-btn-primary {
-        animation: pulse-glow-dark 3s infinite cubic-bezier(0.66, 0, 0, 1);
-    }
-    .neu-btn-primary:hover {
-        box-shadow: 0 12px 24px rgba(0, 0, 0, 0.6), 0 0 25px var(--primary-accent);
-        animation: none;
-    }
+html.dark .neu-btn-primary {
+  animation: pulse-glow-dark 3s infinite cubic-bezier(0.66, 0, 0, 1);
+}
+html.dark .neu-btn-primary:hover {
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.6), 0 0 25px var(--primary-accent);
+  animation: none;
 }
 
 /* Neumorphic Input */
@@ -233,15 +227,13 @@ body {
   z-index: 0;
 }
 
-@media (prefers-color-scheme: dark) {
-  .bg-mesh::after {
-    opacity: 0.35; /* Increased visibility for dark mode */
-    mix-blend-mode: screen; /* Makes white glow on black */
-    filter: invert(1) brightness(1.2); /* Inverts black lines to white and makes them pop */
-  }
-  .bg-city-sketch {
-    opacity: 0.35;
-    mix-blend-mode: screen;
-    filter: invert(1) brightness(1.2);
-  }
+html.dark .bg-mesh::after {
+  opacity: 0.35; /* Increased visibility for dark mode */
+  mix-blend-mode: screen; /* Makes white glow on black */
+  filter: invert(1) brightness(1.2); /* Inverts black lines to white and makes them pop */
+}
+html.dark .bg-city-sketch {
+  opacity: 0.35;
+  mix-blend-mode: screen;
+  filter: invert(1) brightness(1.2);
 }
