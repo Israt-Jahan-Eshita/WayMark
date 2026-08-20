@@ -196,14 +196,23 @@ body {
 
 /* Background Blob Mesh Animation */
 .bg-mesh {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
-  z-index: -1;
-  overflow: hidden;
+  position: relative;
   background-color: var(--bg-color);
+  overflow: hidden;
+}
+
+.bg-mesh::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: url('/city-sketch.png');
+  background-size: cover;
+  background-position: center bottom;
+  background-repeat: no-repeat;
+  opacity: 0.35; /* Increased for better visibility in light mode */
+  mix-blend-mode: multiply;
+  pointer-events: none;
+  z-index: 0;
 }
 
 .bg-city-sketch {
@@ -221,12 +230,13 @@ body {
 
 @media (prefers-color-scheme: dark) {
   .bg-mesh::after {
-    opacity: 0.05;
-    mix-blend-mode: screen;
-    filter: invert(1);
+    opacity: 0.35; /* Increased visibility for dark mode */
+    mix-blend-mode: screen; /* Makes white glow on black */
+    filter: invert(1) brightness(1.2); /* Inverts black lines to white and makes them pop */
   }
   .bg-city-sketch {
-    opacity: 0.25;
-    mix-blend-mode: overlay;
+    opacity: 0.35;
+    mix-blend-mode: screen;
+    filter: invert(1) brightness(1.2);
   }
 }
