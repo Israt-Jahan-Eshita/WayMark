@@ -19,9 +19,7 @@ export default function Footer() {
               WayMark AI is an automated physical accessibility auditing platform. We help civil engineers, city planners, and accessibility advocates quickly verify building compliance using AI vision models.
             </p>
             <div className="flex items-center gap-4 text-[var(--text-secondary)] font-bold text-sm">
-              <a href="#" className="hover:text-[var(--color-primary)] transition-colors">GitHub</a>
-              <a href="#" className="hover:text-[var(--color-primary)] transition-colors">LinkedIn</a>
-              <a href="#" className="hover:text-[var(--color-primary)] transition-colors">Twitter</a>
+              <a href="https://github.com/Israt-Jahan-Eshita/WayMark" target="_blank" rel="noopener noreferrer" className="hover:text-[var(--color-primary)] transition-colors">GitHub</a>
             </div>
           </div>
 
@@ -36,11 +34,10 @@ export default function Footer() {
           </div>
 
           <div>
-            <h3 className="font-bold text-[var(--color-foreground)] mb-4 font-mono uppercase tracking-wider text-sm">Legal</h3>
+            <h3 className="font-bold text-[var(--color-foreground)] mb-4 font-mono uppercase tracking-wider text-sm">Resources</h3>
             <ul className="space-y-3 text-sm text-[var(--text-secondary)]">
-              <li><a href="#" className="hover:text-[var(--color-primary)] transition-colors">Privacy Policy</a></li>
-              <li><a href="#" className="hover:text-[var(--color-primary)] transition-colors">Terms of Service</a></li>
-              <li><a href="#" className="hover:text-[var(--color-primary)] transition-colors">Accessibility Statement</a></li>
+              <li><a href="https://github.com/Israt-Jahan-Eshita/WayMark" target="_blank" rel="noopener noreferrer" className="hover:text-[var(--color-primary)] transition-colors">Source Code</a></li>
+              <li><Link href="/about" className="hover:text-[var(--color-primary)] transition-colors">Accessibility Statement</Link></li>
             </ul>
           </div>
           

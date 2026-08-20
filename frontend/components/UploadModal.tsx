@@ -315,18 +315,6 @@ export default function UploadModal({
                 </button>
               </form>
 
-              {/* Dev shortcut to reuse last for testing easily */}
-              <div className="pt-3 mt-4 border-t border-dashed border-gray-300 dark:border-gray-600 relative z-10">
-                <button 
-                  type="button" 
-                  onClick={(e) => handleSubmit(e, true)}
-                  disabled={loading}
-                  className="w-full neu-btn py-2 px-3 disabled:opacity-50 disabled:cursor-not-allowed text-[10px] font-bold font-mono uppercase tracking-wide bg-[#EBEBEB] dark:bg-[#1A1825] shadow-[2px_2px_4px_rgba(0,0,0,0.1),-2px_-2px_4px_rgba(255,255,255,0.7)] dark:shadow-[2px_2px_4px_rgba(0,0,0,0.5),-2px_-2px_4px_rgba(255,255,255,0.05)] border border-transparent active:shadow-[inset_2px_2px_4px_rgba(0,0,0,0.2),inset_-2px_-2px_4px_rgba(255,255,255,0.5)]"
-                >
-                  {t("reuse_last", "REUSE LAST UPLOAD (DEV)")}
-                </button>
-              </div>
-
             </div>
           </motion.div>
         </div>

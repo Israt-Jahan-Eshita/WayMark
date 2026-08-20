@@ -115,7 +115,16 @@ export default function Chatbot() {
                         : 'bg-white dark:bg-gray-800 text-[var(--color-foreground)] border border-gray-100 dark:border-gray-700 shadow-sm rounded-tl-sm'
                     }`}
                   >
-                    {msg.content}
+                    {msg.role === 'assistant' ? (
+                      <div className="chat-md" dangerouslySetInnerHTML={{ __html: 
+                        msg.content
+                          .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+                          .replace(/\*(.+?)\*/g, '<em>$1</em>')
+                          .replace(/^[\-\*]\s+(.+)$/gm, '<li>$1</li>')
+                          .replace(/(<li>.*<\/li>)/s, '<ul class="list-disc pl-4 my-1 space-y-0.5">$1</ul>')
+                          .replace(/\n/g, '<br/>')
+                      }} />
+                    ) : msg.content}
                   </div>
                   {msg.role === 'user' && (
                     <div className="w-8 h-8 rounded-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center flex-shrink-0 text-gray-500">
