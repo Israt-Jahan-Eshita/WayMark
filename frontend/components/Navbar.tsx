@@ -34,7 +34,8 @@ export default function Navbar() {
     { key: "about", defaultName: "About", href: "/about", icon: <Info className="w-4 h-4" /> },
   ];
 
-  if (isLandingPage) return null;
+  // Navbar is no longer hidden on the landing page so the language toggle is accessible everywhere.
+  const isLandingPage = pathname === "/";
 
   return (
     <>
