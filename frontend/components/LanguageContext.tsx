@@ -117,6 +117,35 @@ const translations: Record<string, Record<Language, string>> = {
   "audits": { en: "Audits", bn: "অডিট" },
   "latest_score": { en: "Latest Score", bn: "সর্বশেষ স্কোর" },
   "official_inspection_report": { en: "Official Inspection Report", bn: "অফিসিয়াল ইন্সপেকশন রিপোর্ট" },
+  
+  // About Page
+  "about_title": { en: "About WayMark AI", bn: "WayMark AI সম্পর্কে" },
+  "about_problem_title": { en: "The Problem", bn: "সমস্যা" },
+  "about_problem_desc": { 
+    en: "Public spaces claim to be \"accessible\" — but there's no reliable way to verify it. Information is inconsistent, based on claims rather than evidence, and manual auditing is too slow to scale.", 
+    bn: "পাবলিক স্পেসগুলো 'অ্যাক্সেসিবল' বলে দাবি করে—কিন্তু তা যাচাই করার কোনো নির্ভরযোগ্য উপায় নেই। তথ্য অসামঞ্জস্যপূর্ণ, প্রমাণের চেয়ে দাবির ওপর নির্ভরশীল, এবং ম্যানুয়াল অডিটিং অনেক ধীরগতির।" 
+  },
+  "about_how_title": { en: "How It Works", bn: "কিভাবে কাজ করে" },
+  "about_how_1": { en: "A photo of a building or facility is submitted.", bn: "কোনো বিল্ডিং বা সুবিধার ছবি সাবমিট করা হয়।" },
+  "about_how_2": { en: "AI (vision model) extracts only what's visibly present — no assumptions, no guessing.", bn: "AI (ভিশন মডেল) শুধুমাত্র যা দৃশ্যমান তা বের করে—কোনো অনুমান বা আন্দাজ নেই।" },
+  "about_how_3": { en: "Extracted features are checked against a curated accessibility checklist.", bn: "বের করা বৈশিষ্ট্যগুলো একটি নির্বাচিত অ্যাক্সেসিবিলিটি চেকলিস্টের সাথে মিলিয়ে দেখা হয়।" },
+  "about_how_4": { en: "Result: a structured audit — verified, flagged, or marked \"cannot verify from this photo\".", bn: "ফলাফল: একটি স্ট্রাকচার্ড অডিট—যাচাইকৃত, ফ্ল্যাগড, অথবা 'এই ছবি থেকে যাচাই করা সম্ভব নয়' হিসেবে চিহ্নিত।" },
+  "about_standard_title": { en: "Our Standard", bn: "আমাদের স্ট্যান্ডার্ড" },
+  "about_standard_desc1": { en: "The checklist used is based on ", bn: "আমাদের ব্যবহৃত চেকলিস্টটি " },
+  "about_standard_desc2": { en: "WHO & National Accessibility Guidelines", bn: "WHO এবং ন্যাশনাল অ্যাক্সেসিবিলিটি গাইডলাইনস" },
+  "about_standard_desc3": { en: ", covering core criteria: ramp access, step-free entrance, doorway width, tactile guidance, accessible restroom, etc. Checklist version: ", bn: "-এর ওপর ভিত্তি করে তৈরি, যা র‍্যাম্প, ধাপ-মুক্ত প্রবেশদ্বার, প্রশস্ত দরজা, ট্যাকটাইল পেভিং, অ্যাক্সেসিবল রেস্টরুম ইত্যাদি যাচাই করে। চেকলিস্ট ভার্সন: " },
+  "about_standard_desc4": { en: " — updated as standards evolve, with past audits tied to the version active at the time.", bn: " — স্ট্যান্ডার্ড আপডেটের সাথে এটি আপডেট হয়, এবং পূর্বের অডিটগুলো তৎকালীন ভার্সনের সাথে যুক্ত থাকে।" },
+  "about_ai_title": { en: "What the AI Does — and Doesn't — Decide", bn: "AI কী সিদ্ধান্ত নেয়—আর কী নেয় না" },
+  "about_ai_desc": { 
+    en: "The AI only extracts what it sees in the photo. It does not set the standard. The checklist and verification logic are built and maintained separately, so results are consistent and auditable — not just \"an AI's opinion.\"", 
+    bn: "AI শুধু ছবিতে যা দেখে তাই বের করে। এটি কোনো স্ট্যান্ডার্ড নির্ধারণ করে না। চেকলিস্ট এবং যাচাইকরণ লজিক আলাদাভাবে তৈরি ও মেইনটেইন করা হয়, যাতে ফলাফলগুলো সামঞ্জস্যপূর্ণ হয়—কেবলমাত্র 'একটি AI-এর মতামত' নয়।" 
+  },
+  "about_limits_title": { en: "Limitations", bn: "সীমাবদ্ধতা" },
+  "about_limits_desc": { 
+    en: "This is not a certified accessibility inspection. A single photo can't capture everything (surface texture, precise measurements, functioning condition). Treat results as a starting reference point, not a final verdict.", 
+    bn: "এটি কোনো সার্টিফায়েড অ্যাক্সেসিবিলিটি ইন্সপেকশন নয়। একটি ছবি সব কিছু (সারফেস টেক্সচার, সঠিক মাপ, বর্তমান অবস্থা) ক্যাপচার করতে পারে না। ফলাফলগুলোকে একটি প্রাথমিক রেফারেন্স পয়েন্ট হিসেবে ধরবেন, চূড়ান্ত রায় হিসেবে নয়।" 
+  },
+
   // Criteria Names
   "crit_ramp": { en: "Ramp", bn: "র‍্যাম্প" },
   "crit_step_free_entrance": { en: "Step Free Entrance", bn: "ধাপ-মুক্ত প্রবেশদ্বার" },
