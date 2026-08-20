@@ -28,10 +28,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     // Redirect logic
     if (!isLoading) {
-      if (!isAuthenticated && pathname !== "/login") {
+      const isProtected = pathname.startsWith("/audit/new");
+      
+      if (isProtected && !isAuthenticated) {
         router.push("/login");
       } else if (isAuthenticated && pathname === "/login") {
-        router.push("/");
+        router.push("/audit/new");
       }
     }
   }, [isAuthenticated, isLoading, pathname, router]);
@@ -39,7 +41,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const login = () => {
     localStorage.setItem("waymark_auth", "true");
     setIsAuthenticated(true);
-    router.push("/");
+    router.push("/audit/new");
   };
 
   const logout = () => {
