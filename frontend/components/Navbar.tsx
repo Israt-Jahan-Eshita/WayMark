@@ -35,7 +35,6 @@ export default function Navbar() {
   ];
 
   // Navbar is no longer hidden on the landing page so the language toggle is accessible everywhere.
-  const isLandingPage = pathname === "/";
 
   return (
     <>
