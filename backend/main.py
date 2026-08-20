@@ -29,18 +29,10 @@ def cleanup_old_uploads():
         print(f"Cleaned up {cleaned_count} old upload folders.")
 
 # Setup CORS to allow requests from our frontend
-# Allow local dev and the configured frontend URL
-frontend_url = os.getenv("FRONTEND_URL", "http://localhost:3000")
-origins = [
-    "http://localhost:3000",
-    frontend_url
-] if frontend_url != "http://localhost:3000" else ["http://localhost:3000"]
-
-# Optional: You can also just use allow_origins=["*"] for a hackathon, 
-# but restricting it is safer.
+# Allowing all origins for the hackathon to prevent CORS deployment headaches.
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=origins,
+    allow_origins=["*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
