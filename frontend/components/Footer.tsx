@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Github, Twitter, Linkedin } from "lucide-react";
+import { Github, Linkedin } from "lucide-react";
 
 export default function Footer() {
   return (
@@ -20,7 +20,6 @@ export default function Footer() {
               WayMark AI is an automated physical accessibility auditing platform. We help civil engineers, city planners, and accessibility advocates quickly verify building compliance using AI vision models.
             </p>
             <div className="flex items-center gap-4 text-[var(--text-secondary)]">
-              <a href="#" className="hover:text-[var(--color-primary)] transition-colors"><Twitter className="w-5 h-5" /></a>
               <a href="#" className="hover:text-[var(--color-primary)] transition-colors"><Github className="w-5 h-5" /></a>
               <a href="#" className="hover:text-[var(--color-primary)] transition-colors"><Linkedin className="w-5 h-5" /></a>
             </div>
