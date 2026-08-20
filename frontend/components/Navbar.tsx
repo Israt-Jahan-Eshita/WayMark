@@ -5,6 +5,7 @@ import { motion, useScroll, useMotionValueEvent } from "framer-motion";
 import { Home, PlusCircle, Building2, Info, Menu, X } from "lucide-react";
 import { useState } from "react";
 import { useLanguage } from "./LanguageContext";
+import { useAuth } from "./AuthProvider";
 
 export default function Navbar() {
   const pathname = usePathname();
@@ -13,6 +14,7 @@ export default function Navbar() {
   const [hidden, setHidden] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
   const { language, toggleLanguage, t } = useLanguage();
+  const { isAuthenticated, logout } = useAuth();
 
   // Hidden strictly on landing page
   const isLandingPage = pathname === "/";
@@ -103,6 +105,15 @@ export default function Navbar() {
           >
             {language === 'en' ? 'বাংলা' : 'EN'}
           </button>
+          
+          {isAuthenticated && (
+            <button 
+              onClick={logout}
+              className="px-3 py-1.5 text-xs font-bold rounded-lg text-red-500 hover:bg-red-500/10 transition-colors uppercase"
+            >
+              Logout
+            </button>
+          )}
         </div>
 
         {/* Mobile Menu Toggle & Lang */}
@@ -148,6 +159,17 @@ export default function Navbar() {
               </Link>
             );
           })}
+          
+          {isAuthenticated && (
+            <div className="pt-2 mt-2 border-t border-gray-200 dark:border-gray-800">
+              <button 
+                onClick={() => { logout(); setMobileMenuOpen(false); }}
+                className="w-full px-4 py-3 rounded-xl text-base font-bold text-red-500 hover:bg-red-500/10 transition-colors text-left"
+              >
+                Logout
+              </button>
+            </div>
+          )}
         </motion.div>
       )}
     </motion.header>
