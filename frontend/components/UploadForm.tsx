@@ -26,7 +26,7 @@ export default function UploadForm({ onReportReceived }: { onReportReceived: (re
     setError(null);
     
     try {
-      const report = await runAudit(buildingName, files, reuseLast);
+      const report = await runAudit(buildingName, "", files, reuseLast);
       onReportReceived(report);
     } catch (err: any) {
       setError(err.message);
