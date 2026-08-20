@@ -121,7 +121,7 @@ export default function Chatbot() {
                           .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
                           .replace(/\*(.+?)\*/g, '<em>$1</em>')
                           .replace(/^[\-\*]\s+(.+)$/gm, '<li>$1</li>')
-                          .replace(/(<li>.*<\/li>)/s, '<ul class="list-disc pl-4 my-1 space-y-0.5">$1</ul>')
+                          .replace(/(<li>[\s\S]*<\/li>)/, '<ul class="list-disc pl-4 my-1 space-y-0.5">$1</ul>')
                           .replace(/\n/g, '<br/>')
                       }} />
                     ) : msg.content}
