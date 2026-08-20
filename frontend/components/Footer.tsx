@@ -47,7 +47,7 @@ export default function Footer() {
         </div>
         
         <div className="mt-12 pt-8 border-t border-gray-200 dark:border-gray-800 flex flex-col md:flex-row justify-between items-center gap-4 text-xs text-[var(--text-secondary)]">
-          <p>© {new Date().getFullYear()} WayMark AI. Built for the Hackathon.</p>
+          <p>© {new Date().getFullYear()} WayMark AI. All rights reserved.</p>
           <p>Designed for universal accessibility.</p>
         </div>
       </div>
