@@ -178,7 +178,7 @@ def chat_with_system(user_messages: List[dict]) -> str:
     try:
         chat_completion = client.chat.completions.create(
             messages=messages,
-            model="llama-3.1-8b-instant", # Using a faster/cheaper model for chat
+            model="qwen/qwen3.6-27b", # Using the same model as extraction
             temperature=0.3,
             max_tokens=1024
         )
