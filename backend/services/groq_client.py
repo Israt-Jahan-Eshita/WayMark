@@ -188,7 +188,10 @@ def chat_with_system(user_messages: List[dict]) -> str:
         )
         
         result_text = chat_completion.choices[0].message.content
-        return result_text.strip()
+        
+        import re
+        cleaned = re.sub(r'<think>.*?(?:</think>|$)', '', result_text, flags=re.DOTALL)
+        return cleaned.strip()
     except Exception as e:
         print(f"Chatbot Error: {e}")
         raise RuntimeError("I'm having trouble connecting to my servers right now. Please try again later.")
